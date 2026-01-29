@@ -1,0 +1,39 @@
+int sensorState;  // replace buttonState with sensorState
+
+void setup() {
+  // LEDs
+  pinMode(7, OUTPUT);
+  pinMode(6, OUTPUT);
+  pinMode(5, OUTPUT);
+
+  // Buzzer
+  pinMode(4, OUTPUT);
+
+  // IR Sensor
+  pinMode(3, INPUT);  // IR sensor OUT connected to pin 3
+}
+
+void loop() {
+  // Read the IR sensor
+  sensorState = digitalRead(3);
+
+  // Check detection
+  if (sensorState == HIGH) {   // If your sensor is active HIGH
+    // Turn ON LEDs
+    digitalWrite(7, HIGH);
+    digitalWrite(6, HIGH);
+    digitalWrite(5, HIGH);
+
+    // Turn ON buzzer
+    tone(4, 1000);  // 1 kHz sound
+  }
+  else {  // No object detected
+    // Turn OFF LEDs
+    digitalWrite(7, LOW);
+    digitalWrite(6, LOW);
+    digitalWrite(5, LOW);
+
+    // Turn OFF buzzer
+    noTone(4);
+  }
+}
