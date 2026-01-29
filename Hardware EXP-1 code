@@ -1,0 +1,38 @@
+int buttonState;  // variable to store button reading
+
+void setup() {
+  // Initialize LEDs
+  pinMode(7, OUTPUT);  // LED 1
+  pinMode(6, OUTPUT);  // LED 2
+  pinMode(5, OUTPUT);  // LED 3
+
+  // Initialize buzzer
+  pinMode(4, OUTPUT);  // Buzzer
+
+  // Initialize button with internal pull-up
+  pinMode(3, INPUT_PULLUP);  // Push button
+}
+
+void loop() {
+  // Read the button state
+  buttonState = digitalRead(3);
+
+  if (buttonState == LOW) {  // Button pressed
+    // Turn ON LEDs
+    digitalWrite(7, HIGH);
+    digitalWrite(6, HIGH);
+    digitalWrite(5, HIGH);
+
+    // Turn ON buzzer (works for passive & active)
+    tone(4, 1000);  // 1 kHz sound
+  }
+  else {  // Button released
+    // Turn OFF LEDs
+    digitalWrite(7, LOW);
+    digitalWrite(6, LOW);
+    digitalWrite(5, LOW);
+
+    // Turn OFF buzzer
+    noTone(4);
+  }
+}
