@@ -1,0 +1,83 @@
+#include <DHT.h>
+
+/* -------- PIN DEFINITIONS -------- */
+#define DHTPIN 3
+#define DHTTYPE DHT11
+
+#define LED_COLD   8   // Cold
+#define LED_NORMAL 9   // Normal
+#define LED_HOT    10  // Hot
+#define BUZZER     11
+
+DHT dht(DHTPIN, DHTTYPE);
+
+/* -------- TIMING -------- */
+unsigned long lastReadTime = 0;
+const unsigned long interval = 2500; // DHT11 needs >2s
+
+void setup() {
+  Serial.begin(9600);
+  dht.begin();
+
+  pinMode(LED_COLD, OUTPUT);
+  pinMode(LED_NORMAL, OUTPUT);
+  pinMode(LED_HOT, OUTPUT);
+  pinMode(BUZZER, OUTPUT);
+
+  digitalWrite(LED_COLD, LOW);
+  digitalWrite(LED_NORMAL, LOW);
+  digitalWrite(LED_HOT, LOW);
+  digitalWrite(BUZZER, LOW);
+
+  Serial.println("DHT11 System Started");
+}
+
+void loop() {
+  if (millis() - lastReadTime >= interval) {
+    lastReadTime = millis();
+
+    float humidity = dht.readHumidity();
+    float temperature = dht.readTemperature(); // Celsius
+
+    // ---- SENSOR FAIL ----
+    if (isnan(humidity) || isnan(temperature)) {
+      Serial.println("DHT11 NOT DETECTED!");
+
+      digitalWrite(LED_COLD, LOW);
+      digitalWrite(LED_NORMAL, LOW);
+      digitalWrite(LED_HOT, LOW);
+      digitalWrite(BUZZER, HIGH);
+      return;
+    }
+
+    // ---- SENSOR OK ----
+    digitalWrite(BUZZER, LOW);
+
+    Serial.print("Humidity: ");
+    Serial.print(humidity);
+    Serial.print(" % | Temp: ");
+    Serial.print(temperature);
+    Serial.println(" C");
+
+    // ---- TEMPERATURE LOGIC ----
+    if (temperature < 20) {
+      // Cold
+      digitalWrite(LED_COLD, HIGH);
+      digitalWrite(LED_NORMAL, LOW);
+      digitalWrite(LED_HOT, LOW);
+    }
+    else if (temperature >= 20 && temperature <= 30) {
+      // Normal
+      digitalWrite(LED_COLD, LOW);
+      digitalWrite(LED_NORMAL, HIGH);
+      digitalWrite(LED_HOT, LOW);
+    }
+    else {
+      // Hot
+      digitalWrite(LED_COLD, LOW);
+      digitalWrite(LED_NORMAL, LOW);
+      digitalWrite(LED_HOT, HIGH);
+      digitalWrite(BUZZER, HIGH);
+    }
+  }
+}
